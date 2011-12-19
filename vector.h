@@ -10,8 +10,7 @@
 #define VEC_MINIMUM_SIZE    100
 #define VEC_RESIZE_FACTOR   2
 
-#define MAX(a,b) ((a)>(b) ? (a) : (b))
-#define MIN(a,b) ((a)<(b) ? (a) : (b))
+#define VEC_MAX(a,b) ((a)>(b) ? (a) : (b))
 
 typedef struct {
     void **data;
@@ -26,6 +25,8 @@ int _vec_resize(vector_t *vec, size_t new_size);
 /* Public API */
 
 void vec_init(vector_t *vec, size_t size);
+
+void vec_clear(vector_t *vec, int32_t free_data);
 
 void vec_add(vector_t *vec, void *value);
 

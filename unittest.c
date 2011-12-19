@@ -713,6 +713,96 @@ int32_t test_rbt_minn(){
     return 1;
 }
 
+int32_t assert_intptr_veccontents(vector_t *vec, intptr_t *expected, size_t n){
+    assert(vec->size == n);
+    
+    for(int i = 0; i < n; i++){
+        assert(((intptr_t)vec->data[i]) == expected[i]);
+    }
+    return 0;
+}
+
+int32_t test_vec_add(){
+    vector_t vec;
+    vec_init(&vec, 0);
+
+    intptr_t values[] = {0xF00, 42, 31337, 0xdeadbeef, 0x1c39};
+    for(int i = 0; i < 5; i++){
+        vec_add(&vec, (void *)values[i]);
+    }
+
+    assert_intptr_veccontents(&vec, values, 5);
+
+    vec_clear(&vec, 0);
+    return 1;
+}
+
+int32_t test_vec_remove(){
+    vector_t vec;
+    vec_init(&vec, 0);
+
+    intptr_t values[] = {0xF00, 42, 31337, 0xdeadbeef, 0x1c39};
+    for(int i = 0; i < 5; i++){
+        vec_add(&vec, (void *)values[i]);
+    }
+    
+    int32_t rixs[] = {2, 3};
+    intptr_t xvals[] = {31337, 0x1c39};
+    for(int i = 0; i < 2; i++){
+        intptr_t r0 = (intptr_t)vec_remove(&vec, rixs[i]);
+        if(r0 != xvals[i]){
+            vec_print(stderr, &vec, generic_intptr_disp);
+            vec_clear(&vec, 0);
+            return 0;
+        }
+    }
+
+    intptr_t lvals[] = {0xF00, 42, 0xdeadbeef};
+    assert_intptr_veccontents(&vec, lvals, 3);
+
+    vec_clear(&vec, 0);
+    return 1;
+}
+
+int32_t test_vec_set(){
+    vector_t vec;
+    vec_init(&vec, 0);
+
+    intptr_t values[] = {0xF00, 42, 31337, 0xdeadbeef, 0x1c39};
+    for(int i = 0; i < 5; i++){
+        vec_add(&vec, (void *)values[i]);
+    }
+    
+    intptr_t rxs[] = {9001, 1337};
+    int32_t ris[] = {3, 0};
+    intptr_t xxs[] = {0xdeadbeef, 0xF00};
+    for(int i = 0; i < 2; i++){
+        intptr_t r0 = (intptr_t)vec_set(&vec, ris[i], (void *)rxs[i]);
+        if(r0 != xxs[i]){
+            vec_clear(&vec, 0);
+            return 0;
+        }
+    }
+
+    intptr_t expected[] = {1337, 42, 31337, 9001, 0x1c39};
+    assert_intptr_veccontents(&vec, expected, 5);
+    
+    vec_clear(&vec, 0);
+    return 1;
+}
+
+int32_t test_vec_addi(){
+    
+
+    return 1;
+}
+
+int32_t test_vec_resize(){
+    
+
+    return 1;
+}
+
 int main(int argc, char **argv){
     int32_t (*TESTS[])() = {
         test_list_addfirst,
@@ -734,7 +824,12 @@ int main(int argc, char **argv){
         test_rbt_insert_overwrite,
         test_rbt_remove_empty,
         test_rbt_maxn,
-        test_rbt_minn
+        test_rbt_minn,
+        test_vec_add,
+        test_vec_remove,
+        test_vec_set,
+        test_vec_addi,
+        test_vec_resize
     };
     const int32_t TEST_LENGTH = sizeof(TESTS) / sizeof(TESTS[0]);
 

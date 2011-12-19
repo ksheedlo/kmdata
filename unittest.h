@@ -9,6 +9,7 @@
 #include "dict.h"
 #include "oat.h"
 #include "rbtree.h"
+#include "vector.h"
 
 int32_t assert_intptr_lstcontents(list_t *lst, intptr_t *expect, int32_t len);
 
@@ -61,4 +62,16 @@ int32_t test_rbt_remove_empty();
 int32_t test_rbt_maxn();
 
 int32_t test_rbt_minn();
+
+int32_t assert_intptr_veccontents(vector_t *vec, intptr_t *expected, size_t n);
+
+int32_t test_vec_add();
+
+int32_t test_vec_remove();
+
+int32_t test_vec_set();
+
+int32_t test_vec_addi();
+
+int32_t test_vec_resize();
 

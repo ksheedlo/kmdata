@@ -5,8 +5,8 @@
 #include "vector.h"
 
 void vec_init(vector_t *vec, size_t size){
-    size_t asize = MAX(size, VEC_MINIMUM_SIZE);
-    void **new_data = malloc(size * sizeof(void *));
+    size_t asize = VEC_MAX(size, VEC_MINIMUM_SIZE);
+    void **new_data = malloc(asize * sizeof(void *));
     if(new_data == NULL){
         fprintf(stderr, "Memory allocation failure.\n");
         vec->data_length = 0;
@@ -14,7 +14,19 @@ void vec_init(vector_t *vec, size_t size){
     }
 
     vec->data = new_data;
-    vec->data_length = size;
+    vec->data_length = asize;
+    vec->size = 0;
+}
+
+void vec_clear(vector_t *vec, int32_t free_data){
+    if(free_data){
+        for(int i = 0; i < vec->size; i++){
+            free(vec->data[i]);
+        }
+    }
+    free(vec->data);
+    vec->data = NULL;
+    vec->data_length = 0;
     vec->size = 0;
 }
 
@@ -60,7 +72,7 @@ void *vec_remove(vector_t *vec, int32_t i){
     }
 
     void *ret = vec->data[i];
-    memmove((vec->data + i), (vec->data + i + 1), vec->size - (1+i));
+    memmove((vec->data + i), (vec->data + i + 1), (vec->size - (1+i))*sizeof(void *));
     vec->size--;
     return ret;
 }
@@ -97,7 +109,7 @@ void *vec_addi(vector_t *vec, int32_t i, void *value){
             return NULL;
     }
 
-    memmove((vec->data + (i+1)), (vec->data + i), (vec->size - i));
+    memmove((vec->data + (i+1)), (vec->data + i), (vec->size - i)*sizeof(void *));
     vec->data[i] = value;
     return value;
 }

@@ -15,7 +15,7 @@ oat.o: oat.c oat.h
 
 rbtree.o: rbtree.c rbtree.h list.o
 
-unittest: unittest.c unittest.h rbtree.o dict.o oat.o list.o error_handling.o tuple.o
+unittest: unittest.c unittest.h vector.c vector.h rbtree.o dict.o oat.o list.o error_handling.o tuple.o
 
 clean :
 	rm unittest *.o *.h.gch 
