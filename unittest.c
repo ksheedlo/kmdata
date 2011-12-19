@@ -414,21 +414,186 @@ int32_t test_dict_resize(){
     return 1;
 }
 
-int32_t test_rbt_add(){
-    
+int32_t generic_strcmp(const void *lhs, const void *rhs){
+    return strcmp((const char *)lhs, (const char *)rhs);
+}
 
+int32_t test_rbt_add(){
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
+
+    char *keys[] = {"foo", "manchu", "xyzzy", "pikachu", "asdfghj"};
+    intptr_t values[] = { 2, 3, 5, 7, 11};
+
+    for(int i = 0; i < 5; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+    }
+
+    int32_t as = rbt_assert(&tree);
+    if(as == 0){
+        rbt_clear(&tree, 0);
+        return 0;
+    }
+
+    for(int i = 0; i < 5; i++){
+        intptr_t r0 = (intptr_t)rbt_get(&tree, keys[i]);
+        if(r0 != values[i]){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    rbt_clear(&tree, 0);
     return 1;
 }
 
 int32_t test_rbt_remove(){
-    
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
 
+    char *keys[] = {"foo", "jew", "boo", "hoo", "bazzy", "snazzy", "jazzy", "lazy"};
+    intptr_t values[] = {2, 3, 5, 7, 11, 13, 17, 19};
+
+    for(int i = 0; i < 8; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+        if(rbt_assert(&tree) == 0){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    char *rkeys[] = {"jew", "bazzy", "snazzy"};
+    intptr_t rvalues[] = {3, 11, 13};
+    int32_t as;
+
+    for(int i = 0; i < 3; i++){
+        intptr_t r0 = (intptr_t)rbt_remove(&tree, rkeys[i], &result);
+        if(r0 != rvalues[i] || ((as = rbt_assert(&tree)) == 0)){
+            fprintf(stderr, "\nExpected: [%s:%d], actual: [%s:%d]\n",
+                rkeys[i], rvalues[i], (char *)result.key, (intptr_t)result.data);
+            fprintf(stderr, "Tree assertion result: %d\n", as);
+
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    char *xkeys[] = {"foo", "boo", "hoo", "jazzy", "lazy"};
+    intptr_t xvalues[] = {2, 5, 7, 17, 19};
+
+    for(int i = 0; i < 5; i++){
+        intptr_t r0 = (intptr_t)rbt_get(&tree, xkeys[i]);
+        if(r0 != xvalues[i] || rbt_assert(&tree) == 0){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    rbt_clear(&tree, 0);
+    return 1;
+}
+
+int32_t test_rbt_get_miss(){
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
+
+    char *keys[] = {"foo", "bar", "car"};
+    intptr_t values[] = {2, 3, 5};
+
+    for(int i = 0; i < 3; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+        if(rbt_assert(&tree) == 0){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    char *try[] = {"construct", "additional", "pylons"};
+
+    for(int i = 0; i < 3; i++){
+        if(rbt_get(&tree, try[i]) != NULL || rbt_assert(&tree) == 0){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    rbt_clear(&tree, 0);
+    return 1;
+}
+
+int32_t test_rbt_insert_overwrite(){
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
+
+    char *keys[] = {"foo", "bar", "car"};
+    intptr_t values[] = {2, 3, 5};
+
+    for(int i = 0; i < 3; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+    }
+
+    intptr_t ovrw[] = {7, 11, 13};
+
+    for(int i = 0; i < 3; i++){
+        rbt_insert(&tree, keys[i], (void *)ovrw[i], &result);
+        if(((intptr_t)result.data) != values[i] || rbt_assert(&tree) == 0){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    for(int i = 0; i < 3; i++){
+        intptr_t r0 = (intptr_t)rbt_get(&tree, keys[i]);
+        if(r0 != ovrw[i]){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    rbt_clear(&tree, 0);
     return 1;
 }
 
 int32_t test_rbt_remove_empty(){
-    
+    /* Tests various possible remove misses on an rbtree. */
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
 
+    void *r0 = rbt_remove(&tree, "beer", &result); /* There is no beer in this tree */
+    if(r0 != NULL || result.data != NULL || result.key != NULL){
+        rbt_clear(&tree, 0);
+        return 0;
+    }
+
+    char *keys[] = {"foo", "bar", "car"}; /* At least there's a bar */
+    intptr_t values[] = {2, 3, 5};
+
+    for(int i = 0; i < 3; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+    }
+
+    char *try[] = {"zap", "qux", "xyzzy"}; /* These are not in the tree either */
+    for(int i = 0; i < 3; i++){
+        r0 = rbt_remove(&tree, try[i], &result);
+        if(r0 != NULL || result.data != NULL || result.key != NULL){
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+    }
+
+    rbt_remove(&tree, "bar", &result);  /* This economy's a bitch. Can't even keep a bar */
+    r0 = rbt_remove(&tree, "bar", &result);
+    if(r0 != NULL || result.data != NULL || result.key != NULL){
+        rbt_clear(&tree, 0);
+        return 0;
+    }
+
+    rbt_clear(&tree, 0);
     return 1;
 }
 
@@ -449,6 +614,8 @@ int main(int argc, char **argv){
         test_dict_resize,
         test_rbt_add, 
         test_rbt_remove,
+        test_rbt_get_miss,
+        test_rbt_insert_overwrite,
         test_rbt_remove_empty
     };
     const int32_t TEST_LENGTH = sizeof(TESTS) / sizeof(TESTS[0]);

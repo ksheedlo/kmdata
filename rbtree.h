@@ -16,6 +16,10 @@
 #define DONE 2 /* internal constant for one of the remove routines */
 #define WORKING 3
 
+/* Flags for tree manipulation */
+#define RBTREE_FREE_KEYS 1
+#define RBTREE_FREE_VALUES 2
+
 struct _rbt; /*Forward declaration */
 
 typedef struct _rbt_node {
@@ -41,9 +45,16 @@ rbnode_t *_rbt_insert_r(rbnode_t *root, rbtree_t *tree, void *key,
                             void *data, rbnode_t *result);
 
 /* Implementation for a dictionary abstract data type. */
+void rbt_init(rbtree_t *tree, int32_t (*cmp)(const void *, const void *));
+
+void rbt_clear(rbtree_t *tree, int32_t options);
+
 void *rbt_insert(rbtree_t *tree, void *key, void *data, rbnode_t *result);
 
 void *rbt_get(rbtree_t *tree, void *key);
+
+void rbt_print(FILE *output, rbtree_t *tree, void (*disp_key)(FILE *, const void *),
+                void (*disp_value)(FILE *, const void *));
 
 /* Returns: key's data entry if it was found and removed, NULL otherwise */
 void *rbt_remove(rbtree_t *tree, void *key, rbnode_t *result);
@@ -60,3 +71,7 @@ rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result);
 
 rbnode_t *_rbt_remove_balance(rbnode_t *root, int32_t dir, rbnode_t *result);
 
+void _rbt_rclear(rbnode_t *node, int32_t options);
+
+void _rbt_print_r(FILE *output, rbnode_t *node, void (*disp_key)(FILE *, const void *),
+                    void (*disp_value)(FILE *, const void *));

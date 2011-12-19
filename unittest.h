@@ -51,6 +51,8 @@ void alpha26(char *buf, intptr_t n);
 
 int32_t test_dict_resize();
 
+int32_t generic_strcmp(const void *lhs, const void *rhs);
+
 int32_t test_rbt_add();
 
 int32_t test_rbt_remove();

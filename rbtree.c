@@ -3,6 +3,39 @@
 
 #include "rbtree.h"
 
+void rbt_init(rbtree_t *tree, int32_t (*cmp)(const void *, const void *)){
+    tree->root = NULL;
+    tree->cmp = cmp;
+    tree->size = 0;
+}
+
+void rbt_clear(rbtree_t *tree, int32_t options){
+    /* Do a recursive clear in post order */
+    _rbt_rclear(tree->root, options);
+    tree->root = NULL;
+    tree->size = 0;
+}
+
+void _rbt_rclear(rbnode_t *node, int32_t options){
+    if(node == NULL){
+        return;
+    }
+
+    _rbt_rclear(node->child[LEFT], options);
+    _rbt_rclear(node->child[RIGHT], options);
+
+    int32_t free_keys = options & RBTREE_FREE_KEYS, 
+        free_values = options & RBTREE_FREE_VALUES;
+
+    if(free_keys){
+        free(node->key);
+    }
+    if(free_values){
+        free(node->data);
+    }
+    free(node);
+}
+
 rbnode_t *rbt_getnode(rbtree_t *tree, void *key){
     /* Looks up key in the tree and returns the node containing it, or NULL if
      * no such node is an elt of the tree */
@@ -110,11 +143,11 @@ void *rbt_remove(rbtree_t *tree, void *key, rbnode_t *result){
 
 int32_t _rbnode_assert(rbnode_t *node){
     int32_t lh, rh;
-    rbtree_t *tree = node->tree;
 
     if(node == NULL){
         return 1;
     }
+    rbtree_t *tree = node->tree;
     rbnode_t *lnode = node->child[LEFT], *rnode = node->child[RIGHT];
 
     /* Consecutive red links test */
@@ -172,6 +205,9 @@ rbnode_t *_rbt_rotated(rbnode_t *root, int32_t dir){
 }
 
 rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result){
+    void *save_key = NULL, *save_data = NULL;
+    int32_t data_saved = 0;
+
     if(root == NULL){
         result->color = DONE;
     }else{
@@ -179,8 +215,9 @@ rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result){
         int32_t diff = root->tree->cmp(root->key, key);
 
         if(diff == 0){
-            result->data = root->data;
-            result->key = root->key;
+            save_data = root->data;
+            save_key = root->key;
+            data_saved = 1;
             if(root->child[LEFT] == NULL || root->child[RIGHT] == NULL){
                 rbnode_t *save = root->child[(root->child[0] == NULL)];
                 
@@ -192,6 +229,8 @@ rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result){
                 }
 
                 free(root);
+                result->key = save_key;
+                result->data = save_data;
                 return save;
             }else{
                 rbnode_t *heir = root->child[LEFT];
@@ -212,6 +251,11 @@ rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result){
         if(!rbt_color(result) == DONE){
             root = _rbt_remove_balance(root, dir, result);
         }
+    }
+
+    if(data_saved){
+        result->key = save_key;
+        result->data = save_data;
     }
     return root;
 }
@@ -257,4 +301,34 @@ rbnode_t *_rbt_remove_balance(rbnode_t *root, int32_t dir, rbnode_t *result){
     }
 
     return root;
+}
+
+void _rbt_print_r(FILE *output, rbnode_t *node, void (*disp_key)(FILE *, const void *),
+                    void (*disp_value)(FILE *, const void *)){
+    /* Parent nodes are responsible for suffixing their print statements with 
+     * commas if there will be more K-V pairs to print. The pairs will be printed
+     * inorder. */
+    if(node->child[LEFT] != NULL){
+        _rbt_print_r(output, node->child[LEFT], disp_key, disp_value);
+        /* Since the left child printed, we need a separator */
+        fprintf(output, ", ");
+    }
+
+    disp_key(output, node->key);
+    fprintf(output, ": ");
+    disp_value(output, node->data);
+
+    if(node->child[RIGHT] != NULL){
+        fprintf(output, ", ");
+        _rbt_print_r(output, node->child[RIGHT], disp_key, disp_value);
+    }
+}
+
+void rbt_print(FILE *output, rbtree_t *tree, void (*disp_key)(FILE *, const void *),
+                void (*disp_value)(FILE *, const void *)){
+    fprintf(output, "{");
+    if(tree->root != NULL){
+        _rbt_print_r(output, tree->root, disp_key, disp_value);
+    }
+    fprintf(output, "}");
 }

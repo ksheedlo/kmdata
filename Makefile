@@ -1,6 +1,6 @@
 CC = gcc
 CXX = g++
-CFLAGS = -O2 -std=gnu99 -Wall -Wno-unused-result 
+CFLAGS = -g -std=gnu99 -Wall -Wno-unused-result 
 CXXFLAGS = -O2 -Wall -Wno-unused-result
 
 error_handling.o: error_handling.c error_handling.h
