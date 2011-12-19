@@ -10,6 +10,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#include "tuple.h"
+#include "list.h"
+
 #define BLACK 0
 #define RED 1
 
@@ -59,6 +62,10 @@ void *rbt_get(rbtree_t *tree, void *key);
 void rbt_print(FILE *output, rbtree_t *tree, void (*disp_key)(FILE *, const void *),
                 void (*disp_value)(FILE *, const void *));
 
+void rbt_maxn(list_t *rop, rbtree_t *tree, int32_t n);
+
+void rbt_minn(list_t *rop, rbtree_t *tree, int32_t n);
+
 /* Returns: key's data entry if it was found and removed, NULL otherwise */
 void *rbt_remove(rbtree_t *tree, void *key, rbnode_t *result);
 
@@ -78,3 +85,5 @@ void _rbt_rclear(rbnode_t *node, int32_t options);
 
 void _rbt_print_r(FILE *output, rbnode_t *node, void (*disp_key)(FILE *, const void *),
                     void (*disp_value)(FILE *, const void *));
+
+int32_t _rbt_maxn_r(list_t *rop, rbnode_t *node, int32_t n, int32_t dir);

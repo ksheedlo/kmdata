@@ -1,3 +1,34 @@
 kmdata -- Data structures for C programmers, by C programmers.
 
+MISSION STATEMENT
+kmdata provides a simple, generic, and open set of abstractions for data
+structures in the GNU C99 language. kmdata structures are highly efficient,
+performant, and portable without sacrificing generality. If you hate the STL
+and the general bloat of C++ but find yourself reinventing the wheel over and
+over again in C, kmdata has your back.
+
+Breaking that down further:
+Efficiency - kmdata chooses asymptotically optimal algorithms and structures.
+Performance - All algorithms and structures are tested and optimized for the 
+    x86/Linux platform.
+Portability - Written to compile and perform out of the box on IA32 and amd64
+    systems. I haven't attempted a port to another architecture yet, but I'm
+    sure ARM is not out of the question.
+
+DOCUMENTATION
+There is some. Not too much. Users shouldn't call functions starting with an 
+underscore. Other than that, most structures follow a similar pattern for usage.
+
+dict_t dict;
+dict_init(&dict);
+...
+dict_clear(&dict, DICTHT_FREE_KEYS | DICTHT_FREE_VALUES);
+
+The above code declares and initializes a dict, does some stuff with it, and
+clears it, freeing keys and values as it goes. Most clear functions have flags
+for specifying whether keys or values (or both) should be freed as the data
+structure is being cleared out. Users should always call the init function
+before starting to use a structure, and the clear function when finished.
+The exception is the tuple type, which is so simple it practically documents
+itself. 
 

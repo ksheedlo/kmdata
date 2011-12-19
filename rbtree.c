@@ -332,3 +332,29 @@ void rbt_print(FILE *output, rbtree_t *tree, void (*disp_key)(FILE *, const void
     }
     fprintf(output, "}");
 }
+
+int32_t _rbt_maxn_r(list_t *rop, rbnode_t *node, int32_t n, int32_t dir){
+    if(node == NULL){
+        return 0;
+    }
+
+    int32_t r0;
+    if((r0 = _rbt_maxn_r(rop, node->child[dir], n, dir)) == n){
+        return n;
+    }
+    
+    list_addlast(rop, node);
+
+    if(++r0 < n){
+        r0 += _rbt_maxn_r(rop, node->child[!dir], n - r0, dir);
+    }
+    return r0;
+}
+
+void rbt_maxn(list_t *rop, rbtree_t *tree, int32_t n){
+    _rbt_maxn_r(rop, tree->root, n, RIGHT);
+}
+
+void rbt_minn(list_t *rop, rbtree_t *tree, int32_t n){
+    _rbt_maxn_r(rop, tree->root, n, LEFT);
+}
