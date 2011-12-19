@@ -10,7 +10,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include "tuple.h"
 #include "list.h"
 
 #define BLACK 0

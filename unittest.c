@@ -15,7 +15,11 @@ int32_t assert_intptr_lstcontents(list_t *lst, intptr_t *expect, int32_t len){
 }
 
 void generic_intptr_disp(FILE *output, const void *value){
+#ifdef __LP64__
+    fprintf(output, "%li", (intptr_t)value);
+#else
     fprintf(output, "%d", (intptr_t)value);
+#endif
 }
 
 int32_t test_list_addfirst(){
@@ -206,7 +210,11 @@ int32_t test_list_filter(){
 
 void generic_tuple_intptr_disp(FILE *output, const void *value){
     tuple_t *tuple = (tuple_t *)value;
+#ifdef __LP64__
+    fprintf(output, "(%li, %li)", (intptr_t)tuple->fst, (intptr_t)tuple->snd);
+#else
     fprintf(output, "(%d, %d)", (intptr_t)tuple->fst, (intptr_t)tuple->snd);
+#endif
 }
 
 int32_t test_list_zip(){
@@ -379,8 +387,13 @@ int32_t test_dict_resize(){
         dict_add(&dict, strdup(buf), (void *)i, &result);
         if(strcmp(result.key, buf) || (intptr_t)result.data != i){
             dict_clear(&dict, DICTHT_FREE_KEYS);
+#ifdef __LP64__
+            fprintf(stderr, "Dict add failure. Expected: (%s:%li), got: (%s:%li)", 
+                buf, i, (char *)result.key, (intptr_t)result.data);
+#else
             fprintf(stderr, "Dict add failure. Expected: (%s:%d), got: (%s:%d)", 
                 buf, i, (char *)result.key, (intptr_t)result.data);
+#endif
             return 0;
         }
     }
@@ -392,7 +405,11 @@ int32_t test_dict_resize(){
         alpha26(buf, i);
         intptr_t r0 = (intptr_t)dict_get(&dict, buf);
         if(r0 != i){
+#ifdef __LP64__
+            fprintf(stderr, "Corrupted dictionary: expected %li, got %li", i, r0);
+#else
             fprintf(stderr, "Corrupted dictionary: expected %d, got %d", i, r0);
+#endif
         }
     }
 
@@ -400,8 +417,13 @@ int32_t test_dict_resize(){
         alpha26(buf, i);
         intptr_t r0 = (intptr_t)dict_remove(&dict, buf, &result);
         if(r0 != i || strcmp(result.key, buf)){
+#ifdef __LP64__
+            fprintf(stderr, "Dict retrieve failure. Expected: (%s:%li), got: (%s:%li)",
+                buf, i, (char *)result.key, r0);
+#else
             fprintf(stderr, "Dict retrieve failure. Expected: (%s:%d), got: (%s:%d)",
                 buf, i, (char *)result.key, r0);
+#endif
             dict_clear(&dict, DICTHT_FREE_KEYS);
             return 0;
         }
@@ -471,8 +493,13 @@ int32_t test_rbt_remove(){
     for(int i = 0; i < 3; i++){
         intptr_t r0 = (intptr_t)rbt_remove(&tree, rkeys[i], &result);
         if(r0 != rvalues[i] || ((as = rbt_assert(&tree)) == 0)){
+#ifdef __LP64__
+            fprintf(stderr, "\nExpected: [%s:%li], actual: [%s:%li]\n",
+                rkeys[i], rvalues[i], (char *)result.key, (intptr_t)result.data);
+#else
             fprintf(stderr, "\nExpected: [%s:%d], actual: [%s:%d]\n",
                 rkeys[i], rvalues[i], (char *)result.key, (intptr_t)result.data);
+#endif
             fprintf(stderr, "Tree assertion result: %d\n", as);
 
             rbt_clear(&tree, 0);

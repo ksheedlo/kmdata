@@ -6,7 +6,6 @@
 #include<stdlib.h>
 #include<stdint.h>
 
-#include "list.h"
 #include "dict.h"
 #include "oat.h"
 #include "rbtree.h"
