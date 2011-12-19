@@ -1,6 +1,9 @@
 /* Ken Sheedlo
  * A red-black tree implementation.
  * Just includes and defs here, of course. 
+ * 
+ * Big thanks go out to Julienne Walker. This would not have been possible 
+ * without his awesome tutorials on red-black trees.
  */
 
 #include<stdint.h>

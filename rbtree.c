@@ -1,4 +1,4 @@
-/* Ken Sheedlo and Nick Vanderweit
+/* Ken Sheedlo
  * A red-black tree implementation. */
 
 #include "rbtree.h"
@@ -229,7 +229,7 @@ rbnode_t *_rbt_remove_r(rbnode_t *root, void *key, rbnode_t *result){
                 }
 
                 free(root);
-                result->key = save_key;
+                result->key = save_keyb
                 result->data = save_data;
                 return save;
             }else{
