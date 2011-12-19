@@ -58,3 +58,7 @@ int32_t test_rbt_remove();
 
 int32_t test_rbt_remove_empty();
 
+int32_t test_rbt_maxn();
+
+int32_t test_rbt_minn();
+

@@ -624,6 +624,95 @@ int32_t test_rbt_remove_empty(){
     return 1;
 }
 
+void generic_testrbnode_disp(FILE *output, const void *ptr){
+    rbnode_t *node = (rbnode_t *)ptr;
+#ifdef __LP64__
+    fprintf(output, "{%s: %li}", (char *)node->key, (intptr_t)node->data);
+#else
+    fprintf(output, "{%s: %d}", (char *)node->key, (intptr_t)node->data);
+#endif
+}
+
+int32_t test_rbt_maxn(){
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
+
+    list_t list;
+    list_init(&list);
+
+    char *keys[] = {"foo", "bar", "baz", "car", "zap", "ice"};
+    intptr_t values[] = {2, 3, 5, 7, 11, 13};
+
+    for(int i = 0; i < 6; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+    }
+
+    rbt_maxn(&list, &tree, 4);
+
+    assert(list.length == 4);
+
+    intptr_t xvals[] = {11, 13, 2, 7};
+    char *xkeys[] = {"zap", "ice", "foo", "car"};
+    node_t *node = list.head->next;
+    for(int i = 0; i<4; i++){
+        rbnode_t *trnode = (rbnode_t *)node->data;
+        if(((intptr_t)trnode->data) != xvals[i] || 
+            strcmp(((char *)trnode->key), xkeys[i])){
+            /* Fail */
+            list_print(stderr, &list, generic_testrbnode_disp);
+            list_clear(&list, 0);
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+        node = node->next;
+    }
+
+    list_clear(&list, 0);
+    rbt_clear(&tree, 0);
+    return 1;
+}
+
+int32_t test_rbt_minn(){
+    rbtree_t tree;
+    rbt_init(&tree, generic_strcmp);
+    rbnode_t result;
+
+    list_t list;
+    list_init(&list);
+
+    char *keys[] = {"foo", "bar", "baz", "car", "zap", "ice"};
+    intptr_t values[] = {2, 3, 5, 7, 11, 13};
+
+    for(int i = 0; i < 6; i++){
+        rbt_insert(&tree, keys[i], (void *)values[i], &result);
+    }
+
+    rbt_minn(&list, &tree, 2);
+
+    assert(list.length == 2);
+
+    intptr_t xvals[] = {3, 5};
+    char *xkeys[] = {"bar", "baz"};
+    node_t *node = list.head->next;
+    for(int i = 0; i<2; i++){
+        rbnode_t *trnode = (rbnode_t *)node->data;
+        if(((intptr_t)trnode->data) != xvals[i] || 
+            strcmp(((char *)trnode->key), xkeys[i])){
+            /* Fail */
+            list_print(stderr, &list, generic_testrbnode_disp);
+            list_clear(&list, 0);
+            rbt_clear(&tree, 0);
+            return 0;
+        }
+        node = node->next;
+    }
+
+    list_clear(&list, 0);
+    rbt_clear(&tree, 0);
+    return 1;
+}
+
 int main(int argc, char **argv){
     int32_t (*TESTS[])() = {
         test_list_addfirst,
@@ -643,7 +732,9 @@ int main(int argc, char **argv){
         test_rbt_remove,
         test_rbt_get_miss,
         test_rbt_insert_overwrite,
-        test_rbt_remove_empty
+        test_rbt_remove_empty,
+        test_rbt_maxn,
+        test_rbt_minn
     };
     const int32_t TEST_LENGTH = sizeof(TESTS) / sizeof(TESTS[0]);
 
