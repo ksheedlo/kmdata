@@ -24,7 +24,7 @@ void pqueue_add(pqueue_t *queue, void *value){
     }
 }
 
-void *pqueue_min(pqueue_t *queue){
+void *pqueue_deletemin(pqueue_t *queue){
     if(queue->vec.size == 0){
         return NULL;
     }
@@ -57,4 +57,6 @@ void *pqueue_min(pqueue_t *queue){
     return result;
 }
 
-
+void *pqueue_findmin(pqueue_t *queue){
+    return vec_get(queue->vec, 0);
+}

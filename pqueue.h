@@ -17,5 +17,7 @@ void pqueue_init(pqueue_t *queue, int32_t (*cmp)(const void *, const void *));
 
 void pqueue_add(pqueue_t *queue, void *value);
 
-void *pqueue_min(pqueue_t *queue);
+void *pqueue_deletemin(pqueue_t *queue);
+
+void *pqueue_findmin(pqueue_t *queue);
 

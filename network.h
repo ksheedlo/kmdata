@@ -8,6 +8,11 @@
 
 #include "dict.h"
 
+#define NW_FREE_VX_KEYS     1
+#define NW_FREE_VX_VALUES   2
+#define NW_FREE_EDGE_VALUES 4
+
+
 typedef struct _gedge {
     void *key;
     void *data;
@@ -40,7 +45,7 @@ void *network_get_vx(network_t *network, void *key);
 
 void *network_get_edge(network_t *network, void *akey, void *bkey);
 
-void *network_remove_vx(network_t *network, void *key);
+void *network_remove_vx(network_t *network, void *key, bucket_t *result, int32_t options);
 
 void *network_remove_edge(network_t *network, void *akey, void *bkey);
 
@@ -50,8 +55,11 @@ void network_dfs(network_t *network, void *skey,
 void network_sp_bfs(network_t *network, list_t *rop, void *start_key, void *end_key);
 
 void network_sp_dijkstra(network_t *network, list_t *rop, void *start_key, 
-    void *end_key, double (*weight)(const void *edge_value));
+    void *end_key, uintmax_t (*weight)(const void *edge_value));
 
 void network_print(FILE *output, network_t *network, 
-    void (*disp_vx)(FILE *output, const void *data), 
+    void (*disp_vxkey)(FILE *output, const void *data), 
+    void (*disp_vxval)(FILE *output, const void *data),
     void (*disp_edge)(FILE *output, const void *data));
+
+void network_clear(network_t *network, int32_t options);

@@ -209,3 +209,25 @@ void _dict_resize(dict_t *dict, size_t new_size){
     dict->table = new_table;
     dict->length = new_size;
 }
+
+void dict_key_set(list_t *rop, dict_t *dict){
+    bucket_t *bucket;
+    for(int i = 0; i < dict->length; i++){
+        if((bucket = dict->table[i]) != NULL){
+            do{
+                list_addlast(rop, bucket->key);
+            }while((bucket = bucket->next) != NULL);
+        }
+    }
+}
+
+void dict_value_set(list_t *rop, dict_t *dict){
+    bucket_t *bucket;
+    for(int i = 0; i < dict->length; i++){
+        if((bucket = dict->table[i]) != NULL){
+            do{
+                list_addlast(rop, bucket->data);
+            }while((bucket = bucket->next) != NULL);
+        }
+    }
+}

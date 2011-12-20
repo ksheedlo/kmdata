@@ -7,6 +7,7 @@
 #include<stdlib.h>
 
 #include "error_handling.h"
+#include "list.h"
 
 #define MAX(a,b) ((a)>(b) ? a : b)
 
@@ -70,3 +71,6 @@ void dict_init(dict_t *dict, size_t size, int32_t (*hash)(const void *),
 void dict_print(FILE *output, dict_t *dict, void (*disp_key)(FILE *, const void *),
     void (*disp_value)(FILE *, const void *));
 
+void dict_key_set(list_t *rop, dict_t *dict);
+
+void dict_value_set(list_t *rop, dict_t *dict);
