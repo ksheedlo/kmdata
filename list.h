@@ -41,6 +41,9 @@ void list_map(list_t *rop, list_t *op, void *(*map)(const void *));
 
 void list_filter(list_t *rop, list_t *op, int32_t (*filt)(const void *));
 
+void *list_reduce(list_t *op, void *(*rfunc)(const void *, const void *), 
+    void *start);
+
 void list_zip(list_t *rop, list_t *op1, list_t *op2);
 
 void list_zipwith(list_t *rop, list_t *op1, list_t *op2,

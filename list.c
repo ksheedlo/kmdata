@@ -215,3 +215,28 @@ void list_zipwith(list_t *rop, list_t *op1, list_t *op2,
         bar = bar->next;
     }
 }
+
+void *list_reduce(list_t *op, void *(*rfunc)(const void *, const void *), void *start){
+    /* Performs a REDUCE operation over op, using the rfunc function to reduce
+     * the list.
+     *
+     * param op the list to reduce.
+     * param rfunc the reducing function.
+     * param start the initializing value, or -1 if no initializer is desired.
+     * If op contains [1..5], and you wish to sum the elements:
+     *  list_reduce(op, +, (void *)0) or list_reduce(op, +, (void *)(-1))
+     * will yield the result, if "+" is equal to a function:
+     * void *plus(void *x, void *y){ return (void *)((intptr_t)x + (intptr_t)y); }
+     */
+    node_t *node = op->head->next;
+    void *acc = start;
+    if((intptr_t)start == -1){
+        acc = node->data;
+        node = node->next;
+    }
+    while(node != op->head){
+        acc = rfunc(acc, node->data);
+        node = node->next;
+    }
+    return acc;
+}
